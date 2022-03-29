@@ -17,18 +17,8 @@ fn git_commit(commit: CommitMsg) {
         .output();
 }
 
-fn main() {
+fn get_type() -> CommitType {
     let mut rl = Editor::<()>::new();
-
-    println!(
-        "commit types :\n\t{}\n\t{}\n\t{}\n\t{}\n\t{}",
-        "feat".clear().red(),
-        "fix".blue(),
-        "docs".yellow(),
-        "refactor".green(),
-        "test".magenta(),
-    );
-
     let commit_type: CommitType;
     let read_type = rl.readline("commit type>> ");
     match read_type {
@@ -58,9 +48,13 @@ fn main() {
             exit(0);
         }
     }
+    commit_type
+}
 
+fn get_desc() -> String {
+    let mut rl = Editor::<()>::new();
     let read_description = rl.readline("description>> ");
-    let commit_desc: String = match read_description {
+    match read_description {
         Ok(line) => line,
         Err(ReadlineError::Interrupted) => {
             eprintln!("CTRL-C");
@@ -74,9 +68,20 @@ fn main() {
             eprintln!("Error: {:?}", err);
             exit(0);
         }
-    };
+    }
+}
 
+fn main() {
+    // TODO: add a -h/--help
+    println!(
+        "commit types :\n\t{}\n\t{}\n\t{}\n\t{}\n\t{}",
+        "feat".clear().red(),
+        "fix".blue(),
+        "docs".yellow(),
+        "refactor".green(),
+        "test".magenta(),
+    );
     // TODO: parse the commit body
-    let msg = CommitMsg::new(commit_type, commit_desc, None);
+    let msg = CommitMsg::new(get_type(), get_desc(), None);
     git_commit(msg);
 }
