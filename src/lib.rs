@@ -46,7 +46,11 @@ impl CommitMsg {
 impl fmt::Display for CommitMsg {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         match &self.body {
-            Some(body) => writeln!(fmt, "{}: {}\n{}", self.commit_type, self.description, body),
+            Some(body) => writeln!(
+                fmt,
+                "{}: {}\n\n{}",
+                self.commit_type, self.description, body
+            ),
             None => writeln!(fmt, "{}: {}\n", self.commit_type, self.description,),
         }
     }
