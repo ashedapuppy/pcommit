@@ -1,4 +1,6 @@
+use rustyline::{error::ReadlineError, Editor};
 use std::fmt;
+use std::process::{exit, Command};
 
 pub enum CommitType {
     Feat,
@@ -46,6 +48,104 @@ impl fmt::Display for CommitMsg {
         match &self.body {
             Some(body) => writeln!(fmt, "{}: {}\n{}", self.commit_type, self.description, body),
             None => writeln!(fmt, "{}: {}\n", self.commit_type, self.description,),
+        }
+    }
+}
+
+pub fn git_add() {
+    let add_output = Command::new("git").arg("add").arg(".").output();
+    if add_output.is_err() {
+        panic!("could not git add")
+    };
+}
+
+pub fn git_commit(commit: CommitMsg) {
+    let commit_output = Command::new("git")
+        .arg("commit")
+        .arg("-m")
+        .arg(commit.to_string())
+        .output();
+    if commit_output.is_err() {
+        panic!("could not git commit")
+    };
+}
+
+pub fn git_push() {
+    if push_y_or_n() {
+        let push_output = Command::new("git").arg("push").output();
+        if push_output.is_err() {
+            panic!("could not git commit")
+        };
+    }
+}
+
+fn push_y_or_n() -> bool {
+    let mut rl = Editor::<()>::new();
+    let read_type = rl.readline("push?(y/n)=> ");
+    match read_type {
+        Ok(line) => match line.as_str() {
+            "y" => true,
+            "n" => false,
+            _ => push_y_or_n(),
+        },
+        Err(ReadlineError::Interrupted) => {
+            eprintln!("CTRL-C");
+            exit(0);
+        }
+        Err(ReadlineError::Eof) => {
+            eprintln!("CTRL-D");
+            exit(0);
+        }
+        Err(err) => {
+            eprintln!("Error: {:?}", err);
+            exit(0);
+        }
+    }
+}
+
+pub fn get_type() -> CommitType {
+    let mut rl = Editor::<()>::new();
+    let read_type = rl.readline("commit type=> ");
+    match read_type {
+        Ok(line) => match line.as_str() {
+            "feat" => CommitType::Feat,
+            "fix" => CommitType::Fix,
+            "docs" => CommitType::Docs,
+            "test" => CommitType::Test,
+            "refactor" => CommitType::Refactor,
+            _ => get_type(),
+        },
+        Err(ReadlineError::Interrupted) => {
+            eprintln!("CTRL-C");
+            exit(0);
+        }
+        Err(ReadlineError::Eof) => {
+            eprintln!("CTRL-D");
+            exit(0);
+        }
+        Err(err) => {
+            eprintln!("Error: {:?}", err);
+            exit(0);
+        }
+    }
+}
+
+pub fn get_desc() -> String {
+    let mut rl = Editor::<()>::new();
+    let read_description = rl.readline("description=> ");
+    match read_description {
+        Ok(line) => line,
+        Err(ReadlineError::Interrupted) => {
+            eprintln!("CTRL-C");
+            exit(0);
+        }
+        Err(ReadlineError::Eof) => {
+            eprintln!("CTRL-D");
+            exit(0);
+        }
+        Err(err) => {
+            eprintln!("Error: {:?}", err);
+            exit(0);
         }
     }
 }
