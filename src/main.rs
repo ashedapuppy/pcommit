@@ -22,63 +22,18 @@ fn git_commit(commit: CommitMsg) {
     };
 }
 
-fn get_type() -> CommitType {
-    let mut rl = Editor::<()>::new();
-    let commit_type: CommitType;
-    let read_type = rl.readline("commit type=> ");
-    match read_type {
-        Ok(line) => {
-            match line.as_str() {
-                "feat" => commit_type = CommitType::Feat,
-                "fix" => commit_type = CommitType::Fix,
-                "docs" => commit_type = CommitType::Docs,
-                "test" => commit_type = CommitType::Test,
-                "refactor" => commit_type = CommitType::Refactor,
-                _ => {
-                    eprintln!("commit type not found");
-                    exit(0);
-                }
-            };
-        }
-        Err(ReadlineError::Interrupted) => {
-            eprintln!("CTRL-C");
-            exit(0);
-        }
-        Err(ReadlineError::Eof) => {
-            eprintln!("CTRL-D");
-            exit(0);
-        }
-        Err(err) => {
-            eprintln!("Error: {:?}", err);
-            exit(0);
-        }
-    }
-    commit_type
-}
-
-fn get_desc() -> String {
-    let mut rl = Editor::<()>::new();
-    let read_description = rl.readline("description=> ");
-    match read_description {
-        Ok(line) => line,
-        Err(ReadlineError::Interrupted) => {
-            eprintln!("CTRL-C");
-            exit(0);
-        }
-        Err(ReadlineError::Eof) => {
-            eprintln!("CTRL-D");
-            exit(0);
-        }
-        Err(err) => {
-            eprintln!("Error: {:?}", err);
-            exit(0);
-        }
+fn git_push(do_b: bool) {
+    if do_b {
+        let push_output = Command::new("git").arg("push").output();
+        if push_output.is_err() {
+            panic!("could not git commit")
+        };
     }
 }
 
 fn push_y_or_n() -> bool {
     let mut rl = Editor::<()>::new();
-    let read_type = rl.readline("commit type=> ");
+    let read_type = rl.readline("push?(y/n)=> ");
     match read_type {
         Ok(line) => match line.as_str() {
             "y" => true,
@@ -100,12 +55,50 @@ fn push_y_or_n() -> bool {
     }
 }
 
-fn git_push(do_b: bool) {
-    if do_b {
-        let push_output = Command::new("git").arg("push").output();
-        if push_output.is_err() {
-            panic!("could not git commit")
-        };
+fn get_type() -> CommitType {
+    let mut rl = Editor::<()>::new();
+    let read_type = rl.readline("commit type=> ");
+    match read_type {
+        Ok(line) => match line.as_str() {
+            "feat" => CommitType::Feat,
+            "fix" => CommitType::Fix,
+            "docs" => CommitType::Docs,
+            "test" => CommitType::Test,
+            "refactor" => CommitType::Refactor,
+            _ => get_type(),
+        },
+        Err(ReadlineError::Interrupted) => {
+            eprintln!("CTRL-C");
+            exit(0);
+        }
+        Err(ReadlineError::Eof) => {
+            eprintln!("CTRL-D");
+            exit(0);
+        }
+        Err(err) => {
+            eprintln!("Error: {:?}", err);
+            exit(0);
+        }
+    }
+}
+
+fn get_desc() -> String {
+    let mut rl = Editor::<()>::new();
+    let read_description = rl.readline("description=> ");
+    match read_description {
+        Ok(line) => line,
+        Err(ReadlineError::Interrupted) => {
+            eprintln!("CTRL-C");
+            exit(0);
+        }
+        Err(ReadlineError::Eof) => {
+            eprintln!("CTRL-D");
+            exit(0);
+        }
+        Err(err) => {
+            eprintln!("Error: {:?}", err);
+            exit(0);
+        }
     }
 }
 
