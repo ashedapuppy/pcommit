@@ -14,7 +14,7 @@ fn main() {
         "test".magenta(),
     );
     // TODO: parse the commit body
-    let msg = CommitMsg::new(get_type(), get_desc(), None);
+    let msg = CommitMsg::new(get_type(), get_desc(), get_body());
     git_add();
     git_commit(msg);
     git_push();
