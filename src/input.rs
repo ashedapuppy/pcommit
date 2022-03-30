@@ -1,20 +1,13 @@
 use rustyline::{error::ReadlineError, Editor};
 use std::process::exit;
 
-use crate::lib::*;
-
-pub fn get_type() -> CommitType {
+pub fn get_type() -> String {
+    let types = ["feat", "fix", "docs", "test", "refactor"];
     let mut rl = Editor::<()>::new();
     let read_type = rl.readline("type=> ");
     match read_type {
-        Ok(line) => match line.as_str() {
-            "feat" => CommitType::Feat,
-            "fix" => CommitType::Fix,
-            "docs" => CommitType::Docs,
-            "test" => CommitType::Test,
-            "refactor" => CommitType::Refactor,
-            _ => get_type(),
-        },
+        Ok(line) if types.contains(&(line.as_str())) => line,
+        Ok(_) => get_type(),
         Err(ReadlineError::Interrupted) => {
             eprintln!("CTRL-C");
             exit(0);
@@ -32,8 +25,8 @@ pub fn get_type() -> CommitType {
 
 pub fn get_body() -> Option<String> {
     let mut rl = Editor::<()>::new();
-    let read_type = rl.readline("body(optional)=> ");
-    match read_type {
+    let read_body = rl.readline("body(optional)=> ");
+    match read_body {
         Ok(line) => match line.as_str() {
             "" => None,
             s => Some(s.to_string()),

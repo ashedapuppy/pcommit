@@ -3,10 +3,11 @@ use colored::*;
 mod git;
 mod input;
 mod lib;
-use crate::lib::*;
+
+use crate::lib::CommitMsg;
 
 fn main() {
-    // TODO: add a -h/--help
+    // TODO: add a -h/--help and/or parse command line args
     println!(
         "commit types :\n\t{}\n\t{}\n\t{}\n\t{}\n\t{}",
         "feat".red(),
