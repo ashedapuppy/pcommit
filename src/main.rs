@@ -22,7 +22,6 @@ struct Args {
 
 fn main() {
     let args = Args::parse();
-    // TODO: add a -h/--help and/or parse command line args
     println!(
         "commit types :\n\t{}\n\t{}\n\t{}\n\t{}\n\t{}",
         "feat".red(),
