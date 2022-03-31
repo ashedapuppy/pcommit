@@ -10,11 +10,11 @@ mod lib;
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Args {
-    /// Disables git add
+    /// Disable git add
     #[clap(short = 'a', long = "no-add")]
     noadd: bool,
 
-    /// Disables git push
+    /// Disable git push
     #[clap(short = 'p', long = "no-push")]
     nopush: bool,
 }
