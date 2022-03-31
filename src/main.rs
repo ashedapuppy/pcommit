@@ -6,6 +6,7 @@ mod git;
 mod input;
 mod lib;
 
+/// git commit formatter
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Args {
