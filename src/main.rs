@@ -1,10 +1,11 @@
-use crate::lib::CommitMsg;
-use clap::Parser;
-use colored::*;
-
 mod git;
 mod input;
 mod lib;
+
+use crate::lib::CommitMsg;
+
+use clap::Parser;
+use colored::*;
 
 /// git commit formatter
 #[derive(Parser, Debug)]
