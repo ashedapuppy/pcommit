@@ -2,8 +2,6 @@ mod git;
 mod input;
 mod lib;
 
-use crate::lib::CommitMsg;
-
 use clap::Parser;
 use colored::*;
 
@@ -30,7 +28,7 @@ fn main() {
         "refactor".green(),
         "test".magenta(),
     );
-    let msg = CommitMsg::new(input::get_type(), input::get_desc(), input::get_body());
+    let msg = lib::CommitMsg::new(input::get_type(), input::get_desc(), input::get_body());
     if !args.no_add {
         git::add();
     }
