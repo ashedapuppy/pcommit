@@ -22,14 +22,13 @@ pub fn commit(commit: CommitMsg) {
 }
 
 pub fn push() {
-    if push_y_or_n() {
-        let push_output = Command::new("git").arg("push").output();
-        if push_output.is_err() {
-            panic!("could not git push")
-        };
-    }
+    let push_output = Command::new("git").arg("push").output();
+    if push_output.is_err() {
+        panic!("could not git push")
+    };
 }
 
+#[allow(dead_code)]
 fn push_y_or_n() -> bool {
     let mut rl = Editor::<()>::new();
     let read_type = rl.readline("push?(y/n)=> ");
