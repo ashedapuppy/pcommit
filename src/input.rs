@@ -18,7 +18,7 @@ pub fn get_type() -> String {
         }
         Err(err) => {
             eprintln!("Error: {:?}", err);
-            exit(0);
+            panic!();
         }
     }
 }
@@ -41,7 +41,7 @@ pub fn get_body() -> Option<String> {
         }
         Err(err) => {
             eprintln!("Error: {:?}", err);
-            exit(1);
+            panic!();
         }
     }
 }
@@ -61,7 +61,7 @@ pub fn get_desc() -> String {
         }
         Err(err) => {
             eprintln!("Error: {:?}", err);
-            exit(0);
+            panic!();
         }
     }
 }

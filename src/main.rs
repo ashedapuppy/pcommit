@@ -31,6 +31,7 @@ fn main() {
     // we get a user input, which can be None for the commit body,
     // so the builder pattern is not necessary
     let msg = lib::CommitMsg::new(input::get_type(), input::get_desc(), input::get_body());
+
     if !args.no_add {
         git::add();
     }
