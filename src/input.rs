@@ -6,7 +6,7 @@ pub fn get_type() -> String {
     let mut rl = Editor::<()>::new();
     let read_type = rl.readline("type=> ");
     match read_type {
-        Ok(line) if types.contains(&(line.as_str())) => line,
+        Ok(line) if types.contains(&(line.as_str().trim())) => line,
         Ok(_) => get_type(),
         Err(ReadlineError::Interrupted) => {
             eprintln!("CTRL-C");
