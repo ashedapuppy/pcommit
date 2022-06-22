@@ -1,6 +1,6 @@
 [package]
 name = "pcommit"
-version = "1.0.2"
+version = "1.0.3"
 edition = "2021"
 authors = ["mael leclerc <mael.leclerc@protonmail.com"]
 license = "Apache-2.0"
