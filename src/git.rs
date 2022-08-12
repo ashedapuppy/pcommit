@@ -42,7 +42,7 @@ pub fn list_changed_files(repo: &Repository) -> Vec<String> {
     list_changed_files
 }
 
-pub fn add(args: Arguments, repo: &Repository, index: &mut Index) -> Result<()> {
+pub fn add(args: &Arguments, repo: &Repository, index: &mut Index) -> Result<()> {
     let files_to_add = if args.add_all {
         list_changed_files(repo)
     } else {

@@ -13,6 +13,10 @@ pub struct Arguments {
     /// Add all changed files to commit
     #[clap(short = 'a', long = "all")]
     add_all: bool,
+
+    // call git push after execution
+    #[clap(short = 'p', long = "push")]
+    push: bool,
 }
 
 fn main() -> Result<()> {
@@ -31,8 +35,12 @@ fn main() -> Result<()> {
     assert!(!git::list_changed_files(&repo).is_empty());
 
     let commit_full = lib::CommitMsg::new(input::get_type(), input::get_description(), None);
-    git::add(args, &repo, &mut index)?;
+    git::add(&args, &repo, &mut index)?;
     git::commit(&repo, commit_full)?;
+
+    if args.push {
+        std::process::Command::new("git").arg("push").output()?;
+    }
 
     Ok(())
 }
