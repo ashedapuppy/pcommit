@@ -1,6 +1,6 @@
 use crate::lib::*;
 use anyhow::Result;
-use git2::{Commit, Index, ObjectType, Repository, Status, Statuses};
+use git2::{Commit, Index, ObjectType, Repository, Status, Statuses, Oid};
 
 pub fn find_last_commit(repo: &Repository) -> Result<Commit> {
     let obj = repo.head()?.resolve()?.peel(ObjectType::Commit)?;
@@ -45,13 +45,13 @@ pub fn add(add_all: bool, repo: &Repository, index: &mut Index) -> Result<()> {
     Ok(())
 }
 
-pub fn commit(repo: &Repository, commit: CommitMsg) -> Result<()> {
+pub fn commit(repo: &Repository, commit: CommitMsg, tag: Option<String>) -> Result<Oid> {
     let mut index = repo.index()?;
     let oid = index.write_tree()?;
     let parent_commit = find_last_commit(repo)?;
     let tree = repo.find_tree(oid)?;
     let sig = repo.signature()?;
-    repo.commit(
+    let oid = repo.commit(
         Some("HEAD"),
         &sig,
         &sig,
@@ -59,5 +59,9 @@ pub fn commit(repo: &Repository, commit: CommitMsg) -> Result<()> {
         &tree,
         &[&parent_commit],
     )?;
-    Ok(())
+    let commit = repo.find_object(oid, Some(ObjectType::Commit))?;
+    if let Some(tag) = tag {
+        return Ok(repo.tag_lightweight(tag.as_str(), &commit, true)?);
+    }
+    Ok(oid)
 }

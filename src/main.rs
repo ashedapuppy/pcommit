@@ -19,6 +19,10 @@ pub struct Arguments {
     /// call git push after execution
     #[clap(short = 'p', long = "push")]
     push: bool,
+
+    /// set a tag on the commit
+    #[clap(short = 't', long = "tag")]
+    tag: Option<String>,
 }
 
 fn main() -> Result<()> {
@@ -40,7 +44,7 @@ fn main() -> Result<()> {
 
     let commit_full = lib::CommitMsg::new(input::get_type(), input::get_description(), None);
     git::add(args.add_all, &repo, &mut index)?;
-    git::commit(&repo, commit_full)?;
+    git::commit(&repo, commit_full, args.tag)?;
 
     if args.push {
         std::process::Command::new("git").arg("push").output()?;
