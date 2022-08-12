@@ -1,67 +1,65 @@
-use rustyline::{error::ReadlineError, Editor};
-use std::process::exit;
+use console::Term;
+use dialoguer::{theme::ColorfulTheme, Input, MultiSelect, Select};
 
-pub fn get_type() -> String {
+use crate::lib::CommitType;
+use anyhow::Result;
+
+pub fn files_to_add(repo: &git2::Repository) -> Result<Vec<String>> {
+    let addlist: Vec<String> = crate::git::list_changed_files(repo);
+    let defaults = vec![true; addlist.len()];
+    let mut addedlist: Vec<String> = vec![];
+
+    assert!(!addlist.is_empty());
+
+    let selections = MultiSelect::with_theme(&ColorfulTheme::default())
+        .with_prompt("Pick files to add to commit (space to select)")
+        .items(&addlist[..])
+        .defaults(&defaults[..])
+        .interact()?;
+
+    if selections.is_empty() {
+        println!("You did not select anything :(");
+    } else {
+        println!("You selected these things:");
+        for selection in selections {
+            let path = &addlist[selection];
+            addedlist.push(path.to_owned());
+            println!("  {}", addlist[selection]);
+        }
+    }
+    Ok(addedlist)
+}
+
+pub fn get_type() -> CommitType {
     let types = ["feat", "fix", "docs", "test", "refactor"];
-    let mut rl = Editor::<()>::new();
-    let read_type = rl.readline("type=> ");
-    match read_type {
-        Ok(line) if types.contains(&(line.as_str().trim())) => line,
-        Ok(_) => get_type(),
-        Err(ReadlineError::Interrupted) => {
-            eprintln!("CTRL-C");
-            exit(0);
-        }
-        Err(ReadlineError::Eof) => {
-            eprintln!("CTRL-D");
-            exit(0);
-        }
-        Err(err) => {
-            eprintln!("Error: {:?}", err);
-            panic!();
-        }
+
+    let selection = Select::with_theme(&ColorfulTheme::default())
+        .with_prompt("commit type")
+        .items(&types)
+        .default(0)
+        .interact_on_opt(&Term::stderr());
+    let commit_type = if let Ok(Some(index)) = selection {
+        types[index]
+    } else {
+        ""
+    };
+
+    match commit_type {
+        "feat" => CommitType::Feat,
+        "fix" => CommitType::Fix,
+        "docs" => CommitType::Docs,
+        "test" => CommitType::Test,
+        "refactor" => CommitType::Refactor,
+        _ => get_type(),
     }
 }
 
-pub fn get_body() -> Option<String> {
-    let mut rl = Editor::<()>::new();
-    let read_body = rl.readline("body(optional)=> ");
-    match read_body {
-        Ok(line) => match line.as_str() {
-            "" => None,
-            s => Some(s.to_string()),
-        },
-        Err(ReadlineError::Interrupted) => {
-            eprintln!("CTRL-C");
-            exit(0);
-        }
-        Err(ReadlineError::Eof) => {
-            eprintln!("CTRL-D");
-            exit(0);
-        }
-        Err(err) => {
-            eprintln!("Error: {:?}", err);
-            panic!();
-        }
-    }
-}
-
-pub fn get_desc() -> String {
-    let mut rl = Editor::<()>::new();
-    let read_description = rl.readline("description=> ");
-    match read_description {
-        Ok(line) => line,
-        Err(ReadlineError::Interrupted) => {
-            eprintln!("CTRL-C");
-            exit(0);
-        }
-        Err(ReadlineError::Eof) => {
-            eprintln!("CTRL-D");
-            exit(0);
-        }
-        Err(err) => {
-            eprintln!("Error: {:?}", err);
-            panic!();
-        }
+pub fn get_description() -> String {
+    let input = Input::with_theme(&ColorfulTheme::default())
+        .with_prompt("commit description")
+        .interact_text();
+    match input {
+        Ok(string) => string,
+        Err(_) => get_description(),
     }
 }
