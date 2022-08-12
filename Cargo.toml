@@ -2,7 +2,7 @@
 name = "pcommit"
 version = "1.1.0"
 edition = "2021"
-authors = ["mael leclerc <mael.leclerc@protonmail.com"]
+authors = ["Ashe Aupepin <ashe.sudosmile@gmail.com>"]
 license = "Apache-2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
