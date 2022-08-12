@@ -16,7 +16,7 @@ pub struct Arguments {
     #[clap(short = 'a', long = "all")]
     add_all: bool,
 
-    // call git push after execution
+    /// call git push after execution
     #[clap(short = 'p', long = "push")]
     push: bool,
 }
