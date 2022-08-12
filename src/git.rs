@@ -1,14 +1,6 @@
 use crate::{lib::*, Arguments};
 use anyhow::Result;
 use git2::{Commit, Index, ObjectType, Repository, Status, Statuses};
-use std::path::Path;
-
-pub fn open_repository<P: AsRef<Path>>(path: P) -> Repository {
-    match Repository::open(path) {
-        Ok(repo) => repo,
-        Err(_) => panic!("failed to open current repository"),
-    }
-}
 
 pub fn find_last_commit(repo: &Repository) -> Result<Commit> {
     let obj = repo.head()?.resolve()?.peel(ObjectType::Commit)?;
@@ -25,7 +17,7 @@ pub fn get_statuses(repo: &Repository) -> Statuses {
     }
 }
 
-pub fn list_changed_files(repo: &Repository) -> Vec<String> {
+pub fn list_of_changed_files(repo: &Repository) -> Vec<String> {
     let statuses = get_statuses(repo);
     let mut list_changed_files: Vec<String> = Vec::new();
     statuses
@@ -42,9 +34,9 @@ pub fn list_changed_files(repo: &Repository) -> Vec<String> {
     list_changed_files
 }
 
-pub fn add(args: &Arguments, repo: &Repository, index: &mut Index) -> Result<()> {
-    let files_to_add = if args.add_all {
-        list_changed_files(repo)
+pub fn add(add_all: bool, repo: &Repository, index: &mut Index) -> Result<()> {
+    let files_to_add = if add_all {
+        list_of_changed_files(repo)
     } else {
         crate::input::files_to_add(repo)?
     };

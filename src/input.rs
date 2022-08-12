@@ -5,7 +5,7 @@ use crate::lib::CommitType;
 use anyhow::Result;
 
 pub fn files_to_add(repo: &git2::Repository) -> Result<Vec<String>> {
-    let addlist: Vec<String> = crate::git::list_changed_files(repo);
+    let addlist: Vec<String> = crate::git::list_of_changed_files(repo);
     let defaults = vec![true; addlist.len()];
     let mut addedlist: Vec<String> = vec![];
 

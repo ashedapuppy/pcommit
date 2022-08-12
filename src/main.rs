@@ -6,6 +6,8 @@ use anyhow::Result;
 use clap::Parser;
 use git2::Repository;
 
+use crate::git::list_of_changed_files;
+
 // git commit formatter
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -29,13 +31,15 @@ fn main() -> Result<()> {
     //!
     let args = Arguments::parse();
 
-    let repo: Repository = git::open_repository(".");
+    let repo: Repository = Repository::open(".")?;
     let mut index = repo.index()?;
 
-    assert!(!git::list_changed_files(&repo).is_empty());
+    if list_of_changed_files(&repo).is_empty() {
+        return Ok(())
+    }
 
     let commit_full = lib::CommitMsg::new(input::get_type(), input::get_description(), None);
-    git::add(&args, &repo, &mut index)?;
+    git::add(args.add_all, &repo, &mut index)?;
     git::commit(&repo, commit_full)?;
 
     if args.push {
