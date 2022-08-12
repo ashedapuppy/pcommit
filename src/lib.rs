@@ -6,7 +6,7 @@ pub enum CommitType {
     Fix,
     Docs,
     Test,
-    Refactor
+    Refactor,
 }
 
 pub struct CommitMsg {
@@ -34,7 +34,8 @@ impl fmt::Display for CommitType {
             CommitType::Docs => "docs",
             CommitType::Test => "test",
             CommitType::Refactor => "refactor",
-        }.to_owned();
+        }
+        .to_owned();
         write!(f, "{}", string)
     }
 }
@@ -42,11 +43,7 @@ impl fmt::Display for CommitType {
 impl fmt::Display for CommitMsg {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match &self.body {
-            Some(body) => writeln!(
-                f,
-                "{}: {}\n\n{}",
-                self.commit_type, self.description, body
-            ),
+            Some(body) => writeln!(f, "{}: {}\n\n{}", self.commit_type, self.description, body),
             None => writeln!(f, "{}: {}\n", self.commit_type, self.description,),
         }
     }

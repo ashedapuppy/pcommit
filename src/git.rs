@@ -1,7 +1,7 @@
 use crate::{lib::*, Arguments};
-use git2::{Repository, Status, Statuses, Index, Commit, ObjectType};
-use std::path::Path;
 use anyhow::Result;
+use git2::{Commit, Index, ObjectType, Repository, Status, Statuses};
+use std::path::Path;
 
 pub fn open_repository<P: AsRef<Path>>(path: P) -> Repository {
     match Repository::open(path) {
@@ -12,7 +12,9 @@ pub fn open_repository<P: AsRef<Path>>(path: P) -> Repository {
 
 pub fn find_last_commit(repo: &Repository) -> Result<Commit> {
     let obj = repo.head()?.resolve()?.peel(ObjectType::Commit)?;
-    let commit = obj.into_commit().map_err(|_| git2::Error::from_str("Couldn't find commit"))?;
+    let commit = obj
+        .into_commit()
+        .map_err(|_| git2::Error::from_str("Couldn't find commit"))?;
     Ok(commit)
 }
 
@@ -30,13 +32,15 @@ pub fn list_changed_files(repo: &Repository) -> Vec<String> {
         .iter()
         .filter(|e| e.status() != Status::CURRENT)
         .for_each(|entry| {
-            if matches!(entry.status(), Status::WT_NEW | Status::WT_MODIFIED | Status::WT_DELETED | Status::WT_RENAMED) {
+            if matches!(
+                entry.status(),
+                Status::WT_NEW | Status::WT_MODIFIED | Status::WT_DELETED | Status::WT_RENAMED
+            ) {
                 list_changed_files.push(entry.path().unwrap().to_owned());
             };
         });
     list_changed_files
 }
-
 
 pub fn add(args: Arguments, repo: &Repository, index: &mut Index) -> Result<()> {
     let files_to_add = if args.add_all {
@@ -49,12 +53,19 @@ pub fn add(args: Arguments, repo: &Repository, index: &mut Index) -> Result<()> 
     Ok(())
 }
 
-pub fn commit(repo: &Repository,commit: CommitMsg) -> Result<()> {
+pub fn commit(repo: &Repository, commit: CommitMsg) -> Result<()> {
     let mut index = repo.index()?;
     let oid = index.write_tree()?;
     let parent_commit = find_last_commit(repo)?;
     let tree = repo.find_tree(oid)?;
     let sig = repo.signature()?;
-    repo.commit(Some("HEAD"), &sig, &sig, &commit.to_string(), &tree, &[&parent_commit])?;
+    repo.commit(
+        Some("HEAD"),
+        &sig,
+        &sig,
+        &commit.to_string(),
+        &tree,
+        &[&parent_commit],
+    )?;
     Ok(())
 }
