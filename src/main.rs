@@ -13,23 +13,16 @@ pub struct Arguments {
     /// Add all changed files to commit
     #[clap(short = 'a', long = "all")]
     add_all: bool,
-
-    /// Disable git push
-    #[clap(short = 'p', long = "no-push")]
-    no_push: bool,
 }
 
 fn main() -> Result<()> {
     //! pcommit generates a commit message from user input according to
     //! [this](https://gist.github.com/qoomon/5dfcdf8eec66a051ecd85625518cfd13)
-    //! commit message convention, it then adds modified files, creates the commit
-    //! and calls git push
+    //! commit message convention, it then adds modified files and creates the commit
     //!
     //! # Usage:
-    //! ./pcommit [-a/--no-add] [-p/--no-push] [-h/--help] [-V/--version]
+    //! ./pcommit [-a/--all] [-h/--help] [-V/--version]
     //!
-    #![warn(missing_docs)]
-    #![warn(missing_doc_code_examples)]
     let args = Arguments::parse();
 
     let repo: Repository = git::open_repository(".");
