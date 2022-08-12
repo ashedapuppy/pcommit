@@ -10,9 +10,10 @@ pub fn open_repository<P: AsRef<Path>>(path: P) -> Repository {
     }
 }
 
-pub fn find_last_commit(repo: &Repository) -> Result<Commit, git2::Error> {
+pub fn find_last_commit(repo: &Repository) -> Result<Commit> {
     let obj = repo.head()?.resolve()?.peel(ObjectType::Commit)?;
-    obj.into_commit().map_err(|_| git2::Error::from_str("Couldn't find commit"))
+    let commit = obj.into_commit().map_err(|_| git2::Error::from_str("Couldn't find commit"))?;
+    Ok(commit)
 }
 
 pub fn get_statuses(repo: &Repository) -> Statuses {
