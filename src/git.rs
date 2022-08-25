@@ -41,15 +41,7 @@ pub fn list_of_changed_files(repo: &Repository) -> Result<Vec<String>> {
     Ok(list_changed_files)
 }
 
-pub fn add(add_all: bool, repo: &Repository, index: &mut Index) -> Result<()> {
-    // if the add_all flag is set, add all (obvsly)
-    // otherwise, call for the files_to_add function in the input module and ask user
-    // which files to add to the commit
-    let files_to_add = if add_all {
-        list_of_changed_files(repo)?
-    } else {
-        crate::input::files_to_add(repo)?
-    };
+pub fn add(index: &mut Index, files_to_add: Vec<String>) -> Result<()> {
     index.add_all(files_to_add, git2::IndexAddOption::DEFAULT, None)?;
     index.write()?;
     Ok(())

@@ -60,12 +60,19 @@ fn main() -> Result<()> {
     let repo: Repository = Repository::open(".")?;
     let mut index = repo.index()?;
 
-    if list_of_changed_files(&repo)?.is_empty() {
+    let files_to_add = if args.add_all {
+        list_of_changed_files(&repo)?
+    } else {
+        crate::input::files_to_add(&repo)?
+    };
+
+    if files_to_add.is_empty() {
+        println!("no file changes to be committed, exiting...");
         return Ok(());
     }
 
     let commit_full = lib::CommitMsg::new(input::get_type(), input::get_description(), None);
-    git::add(args.add_all, &repo, &mut index)?;
+    git::add(&mut index, files_to_add)?;
     git::commit(&repo, commit_full, args.tag)?;
 
     if args.push {
