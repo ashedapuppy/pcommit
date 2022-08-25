@@ -16,7 +16,8 @@ where T: AsRef<str> + std::fmt::Display {
         .interact()?;
 
     if selections.is_empty() {
-        println!("You did not select anything :(");
+        println!("You have to select at least one file to add to commit");
+        return files_to_add(addlist);
     } else {
         println!("You selected these things:");
         for selection in selections {
