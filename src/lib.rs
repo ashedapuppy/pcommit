@@ -26,17 +26,21 @@ impl CommitMsg {
     }
 }
 
-impl fmt::Display for CommitType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let string = match self {
+impl From<CommitType> for String {
+    fn from(val: CommitType) -> Self { 
+        match val {
             CommitType::Feat => "feat",
             CommitType::Fix => "fix",
             CommitType::Docs => "docs",
             CommitType::Test => "test",
             CommitType::Refactor => "refactor",
-        }
-        .to_owned();
-        write!(f, "{}", string)
+        }.to_string()
+    }
+}
+
+impl fmt::Display for CommitType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", String::from(*self))
     }
 }
 

@@ -30,6 +30,10 @@ pub struct Arguments {
     /// set a tag on the commit
     #[clap(short = 't', long = "tag")]
     tag: Option<String>,
+
+    /// path to the git repo
+    #[clap(long = "path", default_value = ".")]
+    path: String
 }
 
 fn main() -> Result<()> {
@@ -57,7 +61,8 @@ fn main() -> Result<()> {
         ),
     ])?;
 
-    let repo: Repository = Repository::open(".")?;
+    // open the local git repo and parse its index
+    let repo: Repository = Repository::open(args.path)?;
     let mut index = repo.index()?;
 
     let changed_files = list_of_changed_files(&repo)?;
