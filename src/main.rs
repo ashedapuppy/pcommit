@@ -78,7 +78,6 @@ fn main() -> Result<()> {
         changed_files.iter().map(|s| s.as_str()).collect()
     };
 
-
     let commit_full = lib::CommitMsg::new(input::get_type(), input::get_description(), None);
     git::add(&mut index, &files_to_add)?;
     git::commit(&repo, commit_full, args.tag)?;
