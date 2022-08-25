@@ -4,13 +4,14 @@ use dialoguer::{theme::ColorfulTheme, Input, MultiSelect, Select};
 use crate::lib::CommitType;
 use anyhow::Result;
 
-pub fn files_to_add(addlist: Vec<String>) -> Result<Vec<String>> {
+pub fn files_to_add<T>(addlist: &[T]) -> Result<Vec<&str>> 
+where T: AsRef<str> + std::fmt::Display {
     let defaults = vec![true; addlist.len()];
-    let mut addedlist: Vec<String> = vec![];
+    let mut addedlist: Vec<&str> = vec![];
 
     let selections = MultiSelect::with_theme(&ColorfulTheme::default())
         .with_prompt("Pick files to add to commit (space to select)")
-        .items(&addlist[..])
+        .items(addlist)
         .defaults(&defaults[..])
         .interact()?;
 
@@ -20,7 +21,7 @@ pub fn files_to_add(addlist: Vec<String>) -> Result<Vec<String>> {
         println!("You selected these things:");
         for selection in selections {
             let path = &addlist[selection];
-            addedlist.push(path.to_owned());
+            addedlist.push(path.as_ref());
             println!("  {}", addlist[selection]);
         }
     }

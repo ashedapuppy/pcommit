@@ -41,7 +41,7 @@ pub fn list_of_changed_files(repo: &Repository) -> Result<Vec<String>> {
     Ok(list_changed_files)
 }
 
-pub fn add(index: &mut Index, files_to_add: Vec<String>) -> Result<()> {
+pub fn add(index: &mut Index, files_to_add: &[&str]) -> Result<()> {
     index.add_all(files_to_add, git2::IndexAddOption::DEFAULT, None)?;
     index.write()?;
     Ok(())

@@ -38,7 +38,7 @@ fn main() -> Result<()> {
     //! commit message convention, it then adds modified files and creates the commit
     //!
     //! # Usage:
-    //! ./pcommit [-a/--all] [-h/--help] [-V/--version]
+    //! ./pcommit [-a/--all] [-p/--push] [-t/--tag] [-h/--help] [-V/--version]
     //!
     let args = Arguments::parse();
 
@@ -67,15 +67,15 @@ fn main() -> Result<()> {
         return Ok(());
     }
 
-    let files_to_add = if !args.add_all {
-        crate::input::files_to_add(changed_files)?
+    let files_to_add: Vec<&str> = if !args.add_all {
+        crate::input::files_to_add(&changed_files)?
     } else {
-        changed_files
+        changed_files.iter().map(|s| s.as_str()).collect()
     };
 
 
     let commit_full = lib::CommitMsg::new(input::get_type(), input::get_description(), None);
-    git::add(&mut index, files_to_add)?;
+    git::add(&mut index, &files_to_add)?;
     git::commit(&repo, commit_full, args.tag)?;
 
     if args.push {
