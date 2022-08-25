@@ -9,8 +9,6 @@ pub fn files_to_add(repo: &git2::Repository) -> Result<Vec<String>> {
     let defaults = vec![true; addlist.len()];
     let mut addedlist: Vec<String> = vec![];
 
-    assert!(!addlist.is_empty());
-
     let selections = MultiSelect::with_theme(&ColorfulTheme::default())
         .with_prompt("Pick files to add to commit (space to select)")
         .items(&addlist[..])
