@@ -11,10 +11,10 @@ pub fn find_last_commit(repo: &Repository) -> Result<Commit> {
     Ok(commit)
 }
 
-pub fn get_statuses(repo: &Repository) -> Result<Statuses, git2::Error> {
+pub fn get_statuses(repo: &Repository) -> Result<Statuses> {
     repo.statuses(None).map_err(|e| {
         error!("failed to find files statuses of repository");
-        e
+        e.into()
     })
 }
 
@@ -32,7 +32,7 @@ pub fn list_of_changed_files(repo: &Repository) -> Result<Vec<String>> {
                 list_changed_files.push(match entry.path() {
                     Some(path) => path,
                     None => {
-                        error!("wrong path found in list of changed files");
+                        error!("nonexistent path found in list of changed files");
                         ""
                     },
                 }.to_owned());
