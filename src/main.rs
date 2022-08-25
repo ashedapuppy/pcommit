@@ -2,6 +2,13 @@ mod git;
 mod input;
 mod lib;
 
+#[macro_use]
+extern crate log;
+extern crate simplelog;
+use std::fs::File;
+
+use simplelog::*;
+
 use anyhow::Result;
 use clap::Parser;
 use git2::Repository;
@@ -35,11 +42,26 @@ fn main() -> Result<()> {
     //!
     let args = Arguments::parse();
 
+    // setup logging
+    CombinedLogger::init(vec![
+        TermLogger::new(
+            LevelFilter::Warn,
+            Config::default(),
+            TerminalMode::Mixed,
+            ColorChoice::Auto,
+        ),
+        WriteLogger::new(
+            LevelFilter::Info,
+            Config::default(),
+            File::create("pcommit.log")?,
+        ),
+    ])?;
+
     let repo: Repository = Repository::open(".")?;
     let mut index = repo.index()?;
 
-    if list_of_changed_files(&repo).is_empty() {
-        return Ok(())
+    if list_of_changed_files(&repo)?.is_empty() {
+        return Ok(());
     }
 
     let commit_full = lib::CommitMsg::new(input::get_type(), input::get_description(), None);

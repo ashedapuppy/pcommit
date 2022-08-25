@@ -1,24 +1,25 @@
 use crate::lib::*;
 use anyhow::Result;
-use git2::{Commit, Index, ObjectType, Repository, Status, Statuses, Oid};
+use git2::{Commit, Index, ObjectType, Oid, Repository, Status, Statuses};
 
 pub fn find_last_commit(repo: &Repository) -> Result<Commit> {
     let obj = repo.head()?.resolve()?.peel(ObjectType::Commit)?;
-    let commit = obj
-        .into_commit()
-        .map_err(|_| git2::Error::from_str("Couldn't find commit"))?;
+    let commit = obj.into_commit().map_err(|_| {
+        error!("couldn't find last commit");
+        git2::Error::from_str("Couldn't find commit")
+    })?;
     Ok(commit)
 }
 
-pub fn get_statuses(repo: &Repository) -> Statuses {
-    match repo.statuses(None) {
-        Ok(statuses) => statuses,
-        Err(_) => panic!("failed to find file statuses of repository"),
-    }
+pub fn get_statuses(repo: &Repository) -> Result<Statuses, git2::Error> {
+    repo.statuses(None).map_err(|e| {
+        error!("failed to find files statuses of repository");
+        e
+    })
 }
 
-pub fn list_of_changed_files(repo: &Repository) -> Vec<String> {
-    let statuses = get_statuses(repo);
+pub fn list_of_changed_files(repo: &Repository) -> Result<Vec<String>> {
+    let statuses = get_statuses(repo)?;
     let mut list_changed_files: Vec<String> = Vec::new();
     statuses
         .iter()
@@ -28,15 +29,24 @@ pub fn list_of_changed_files(repo: &Repository) -> Vec<String> {
                 entry.status(),
                 Status::WT_NEW | Status::WT_MODIFIED | Status::WT_DELETED | Status::WT_RENAMED
             ) {
-                list_changed_files.push(entry.path().unwrap().to_owned());
+                list_changed_files.push(match entry.path() {
+                    Some(path) => path,
+                    None => {
+                        error!("wrong path found in list of changed files");
+                        ""
+                    },
+                }.to_owned());
             };
         });
-    list_changed_files
+    Ok(list_changed_files)
 }
 
 pub fn add(add_all: bool, repo: &Repository, index: &mut Index) -> Result<()> {
+    // if the add_all flag is set, add all (obvsly)
+    // otherwise, call for the files_to_add function in the input module and ask user
+    // which files to add to the commit
     let files_to_add = if add_all {
-        list_of_changed_files(repo)
+        list_of_changed_files(repo)?
     } else {
         crate::input::files_to_add(repo)?
     };
@@ -46,6 +56,8 @@ pub fn add(add_all: bool, repo: &Repository, index: &mut Index) -> Result<()> {
 }
 
 pub fn commit(repo: &Repository, commit: CommitMsg, tag: Option<String>) -> Result<Oid> {
+    // honestly, I wrote this without bothering to comment and now I don't understand
+    // my own code because of how ugly the git2 api is...
     let mut index = repo.index()?;
     let oid = index.write_tree()?;
     let parent_commit = find_last_commit(repo)?;
