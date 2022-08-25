@@ -48,6 +48,7 @@ pub fn get_type() -> CommitType {
         "docs" => CommitType::Docs,
         "test" => CommitType::Test,
         "refactor" => CommitType::Refactor,
+        // if error, call function again to ask for user input
         _ => get_type(),
     }
 }
@@ -58,6 +59,7 @@ pub fn get_description() -> String {
         .interact_text();
     match input {
         Ok(string) => string,
+        // if error, call function again to ask for user input
         Err(_) => get_description(),
     }
 }
