@@ -57,7 +57,7 @@ fn main() -> Result<()> {
         WriteLogger::new(
             LevelFilter::Info,
             Config::default(),
-            File::create("pcommit.log")?,
+            File::create("~/.cache/pcommit.log")?,
         ),
     ])?;
 
