@@ -5,7 +5,6 @@ mod lib;
 #[macro_use]
 extern crate log;
 extern crate simplelog;
-use std::fs::File;
 
 use simplelog::*;
 
@@ -33,7 +32,7 @@ pub struct Arguments {
 
     /// path to the git repo
     #[clap(long = "path", default_value = ".")]
-    path: String
+    path: String,
 }
 
 fn main() -> Result<()> {
@@ -47,19 +46,12 @@ fn main() -> Result<()> {
     let args = Arguments::parse();
 
     // setup logging
-    CombinedLogger::init(vec![
-        TermLogger::new(
-            LevelFilter::Warn,
-            Config::default(),
-            TerminalMode::Mixed,
-            ColorChoice::Auto,
-        ),
-        WriteLogger::new(
-            LevelFilter::Info,
-            Config::default(),
-            File::create("pcommit.log")?,
-        ),
-    ])?;
+    CombinedLogger::init(vec![TermLogger::new(
+        LevelFilter::Warn,
+        Config::default(),
+        TerminalMode::Mixed,
+        ColorChoice::Auto,
+    )])?;
 
     // open the local git repo and parse its index
     let repo: Repository = Repository::open(args.path)?;
