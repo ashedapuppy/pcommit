@@ -7,3 +7,4 @@ Cargo.lock
 
 # rust tags for my secondary editor
 rusty-tags.vi
+**/pcommit.log
